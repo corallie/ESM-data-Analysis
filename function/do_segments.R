@@ -10,7 +10,7 @@
 #' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
-do_segments <- function(data, cut_at_mean = T) {
+do_segments <- function(data, cut_at_mean = FALSE) {
   # 
   # 
   # On vérifie les colnames dans data : 
@@ -30,7 +30,7 @@ do_segments <- function(data, cut_at_mean = T) {
   group_segments <- NULL
   # 
   # 
-  # id = 1 #test for
+  # id = 2 #test for
   for (id in list_id) {# Pour chacun des id,
     # 
     # 
@@ -61,17 +61,18 @@ do_segments <- function(data, cut_at_mean = T) {
     # 
     # 
     # 
+    # i_segment <- 1 #test for
     for (i_segment in 1:nb_segment) {# Pour chacun des segments, 
       # 
       # Le début et la fin du segment : 
-      t1 <- id_data[i_segment, 1]
-      t2 <- id_data[i_segment+1, 1]
+      t1 <- id_data$hr[i_segment]
+      t2 <- id_data$hr[i_segment+1]
       # et la différence de temps écoulé : 
       diff_t <- t2 - t1
       # 
       # Les valeurs du suivi associées : 
-      y1 <- id_data[i_segment, 2]
-      y2 <- id_data[i_segment+1, 2]
+      y1 <- id_data$NegA[i_segment]
+      y2 <- id_data$NegA[i_segment+1]
       # et la différence des deux valeurs : 
       diff_y <- y2 - y1
       # 
@@ -200,8 +201,9 @@ do_segments <- function(data, cut_at_mean = T) {
   if (cut_at_mean) group_segments[ , colnames(group_segments) == "mean_inter"] <- NULL
   # 
   # 
-  # 
+  # Function output : 
   return(group_segments)
+  # 
   # 
 }
 # 

@@ -265,7 +265,9 @@ do_phases <- function(data, segments) {
   rownames(group_phases) <- NULL
   # 
   # 
+  # Function output : 
   return(group_phases)
+  # 
   # 
 }
 # 

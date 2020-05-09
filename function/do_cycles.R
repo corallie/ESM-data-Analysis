@@ -1,7 +1,6 @@
 #' Title
 #'
-#' @param segments_cut 
-#' @param type 
+#' @param data 
 #'
 #' @return
 #' @export
@@ -10,18 +9,11 @@
 #' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
-do_cycles <- function(segments_cut) {
+do_cycles <- function(data = data) {
   # 
   # 
-  # On vérifie les colnames dans segments_cut : 
-  if (!all(c('id', 
-             't1', 't2', 'diff_t', 
-             'y1', 'y2', 'diff_y', 
-             'slope', 'intercept', 
-             'auc_to_mean', 'auc_to_min', 
-             'ind') %in% colnames(segments_cut)))
-    stop('segments_cut in wrong format')
-  # 
+  # On doit découper les segments traversent la moyenne de chaque id : 
+  segments_cut <- do_segments(data = data, cut_at_mean = TRUE)
   # 
   # 
   # La liste des id :
@@ -158,7 +150,7 @@ do_cycles <- function(segments_cut) {
   }
   # 
   # 
-  # et on sauvegarde : 
+  # Function output : 
   return(group_cycles)
   # 
   # 

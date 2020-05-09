@@ -44,15 +44,8 @@ table_phases <- function(phases, save_at = NULL) {
   colnames(phases_features) <- paste0("id_", colnames(phases_features))
   # 
   # 
-  # On sauvegarde dans un fichier : 
-  if (!is.null(save_at))
-    write.csv(phases_features, 
-              row.names = T, 
-              file = paste0('./figure/TABLE__PHASES__summary.csv'))
-  # 
-  # 
-  if (is.null(save_at))
-    return(phases_features)
+  # Function output : 
+  return(phases_features)
   # 
   # 
 }

@@ -40,15 +40,8 @@ table_segments <- function(segments, save_at = NULL) {
   colnames(segments_features) <- paste0("id_", colnames(segments_features))
   # 
   # 
-  # On sauvegarde dans un fichier : 
-  if (!is.null(save_at))
-    write.csv(segments_features, 
-              row.names = TRUE, 
-              file = paste0('./figure/TABLE__SEGMENTS__summary.csv'))
-  # 
-  # 
-  if (is.null(save_at))
-    return(segments_features)
+  # Function output : 
+  return(segments_features)
   # 
   # 
 }

@@ -26,15 +26,8 @@ table_cycles <- function(cycles, save_at = NULL) {
   colnames(cycles_features) <- paste0("id_", colnames(cycles_features))
   # 
   # 
-  # On sauvegarde dans un fichier : 
-  if (!is.null(save_at))
-    write.csv(cycles_features, 
-              row.names = T, 
-              file = paste0('./figure/TABLE__CYCLES__summary.csv'))
-  # 
-  # 
-  if (is.null(save_at))
-    return(cycles_features)
+  # Function output : 
+  return(cycles_features)
   # 
   # 
 }

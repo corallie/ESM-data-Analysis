@@ -118,10 +118,6 @@ plot_phases <- function(data, segments, phases, id, save_at = NULL, do_legend = 
   }
   # 
   # 
-  # Rajout de la ligne en rouge de la moyenne : 
-  abline(h = id_mean, col = "red", lwd = 1.25)
-  # 
-  # 
   # Rajout des points de mesures du suivi : 
   points(x = id_data$hr, 
          y = id_data$NegA, 
