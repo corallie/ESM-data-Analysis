@@ -14,9 +14,8 @@ do_segments <- function(data, cut_at_mean = T) {
   # 
   # 
   # On vérifie les colnames dans data : 
-  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) {
-    stop('data pas dans le bon format')
-  }
+  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
+    stop('data should have columns : id, hr and NegA')
   # 
   # 
   # On sélectionne les colonnes : 
@@ -31,7 +30,6 @@ do_segments <- function(data, cut_at_mean = T) {
   group_segments <- NULL
   # 
   # 
-  # 
   # id = 1 #test for
   for (id in list_id) {# Pour chacun des id,
     # 
@@ -40,7 +38,6 @@ do_segments <- function(data, cut_at_mean = T) {
     id_data     <- data[data$id == id, -1]
     # -1: pour supprimer la colonne contenant la valeur de l'id, on ne garde que 
     # les colonnes hr et NegA
-    # 
     # 
     # 
     # On calcule sa moyenne et son écart-type : 
@@ -59,7 +56,7 @@ do_segments <- function(data, cut_at_mean = T) {
     # 
     # 
     # On initialise une variable qui nous permettra de faire les calculs des cycles : 
-    cycle <- 1
+    ind <- 1
     # (ne fonctionne quand dans le cas no_cut_segments = TRUE)
     # 
     # 
@@ -79,10 +76,10 @@ do_segments <- function(data, cut_at_mean = T) {
       diff_y <- y2 - y1
       # 
       # 
-      # La pente est : 
-      pente <- diff_y / diff_t
+      # La slope est : 
+      slope <- diff_y / diff_t
       # et l'ordonnée à l'origine est :
-      ord_origine <- (t2*y1 - t1*y2) / diff_t
+      intercept <- (t2*y1 - t1*y2) / diff_t
       # 
       # 
       # Pour le calcul des cycles, on va devoir découper les segments en deux 
@@ -109,11 +106,11 @@ do_segments <- function(data, cut_at_mean = T) {
         # 
         # 
         # On reste dans le même cycle :
-        cycle <- cycle
+        ind <- ind
         # 
         # 
         # On regroupe les informations du segment en cours : 
-        id_segment <- c(id, t1, t2, diff_t, y1, y2, diff_y, pente, ord_origine, aire_slc, aire_ymin, cycle, intersection_avec_moyenne)
+        id_segment <- c(id, t1, t2, diff_t, y1, y2, diff_y, slope, intercept, aire_slc, aire_ymin, ind, intersection_avec_moyenne)
         # 
         # 
         # On les sauvegarde les caractéristiques du segment en cours dans la variable id_segments : 
@@ -122,9 +119,10 @@ do_segments <- function(data, cut_at_mean = T) {
         # 
       } else if (cut_at_mean & intersection_avec_moyenne != 0) { #Si le segment traverse la moyenne
         # 
+        # 
         # On va devoir couper le segment, le point de coupe est en : 
         y <- id_mean #y = la moyenne
-        t <- (y - ord_origine) / pente #t = hr pour lequel on passe par la moyenne
+        t <- (y - intercept) / slope #t = hr pour lequel on passe par la moyenne
         # 
         # 
         # On calcule les différences avant la moyenne :  
@@ -151,10 +149,10 @@ do_segments <- function(data, cut_at_mean = T) {
         # 
         # On regroupe les informations du segment en cours, soit : 
         # 1) la partie avant la moyenne (cycle le même que le précédent) : 
-        id_segment_avmoy <- c(id, t1, t, diff_t_avmoy, y1, y, diff_y_avmoy, pente, ord_origine, aire_slc_avmoy, aire_ymin_avmoy, cycle, intersection_avec_moyenne)
+        id_segment_avmoy <- c(id, t1, t, diff_t_avmoy, y1, y, diff_y_avmoy, slope, intercept, aire_slc_avmoy, aire_ymin_avmoy, ind, intersection_avec_moyenne)
         # 2) la partie après la moyenne (on entre dans un nouveau cycle) : 
-        cycle <- cycle + 1
-        id_segment_apmoy <- c(id, t, t2, diff_t_apmoy, y, y2, diff_y_apmoy, pente, ord_origine, aire_slc_apmoy, aire_ymin_apmoy, cycle, intersection_avec_moyenne)
+        ind <- ind + 1
+        id_segment_apmoy <- c(id, t, t2, diff_t_apmoy, y, y2, diff_y_apmoy, slope, intercept, aire_slc_apmoy, aire_ymin_apmoy, ind, intersection_avec_moyenne)
         # 
         # 
         # On les sauvegarde les caractéristiques des deux parties du segment en cours dans la variable id_segments : 
@@ -182,17 +180,19 @@ do_segments <- function(data, cut_at_mean = T) {
   # 
   # 
   # On renomme les colonnes : 
-  colnames(group_segments) <- c("id", "t1", "t2", "diff_t", "y1", "y2", "diff_y", "pente", "ord_origine", "aire_2mean", "aire_2min", "cycle", "mean_inter", "segment_nb")
-  # Attention : aire_2mean    = aire avec pour base la moyenne de l'id (ligne 42)
-  #             et aire_2min  = aire avec pour base la valeur minimal de l'id (ligne 45)
-  #             et mean_inter = variable qui permet de localiser les segments créés 
+  colnames(group_segments) <- c("id", "t1", "t2", "diff_t", "y1", "y2", "diff_y", 
+                                "slope", "intercept", "auc_to_mean", "auc_to_min", 
+                                "ind", "mean_inter", "segment_nb")
+  # [ Attention : auc_to_mean     = aire avec pour base la moyenne de l'id (ligne 42)
+  #               et auc_2min   = aire avec pour base la valeur minimal de l'id (ligne 45)
+  #               et mean_inter = variable qui permet de localiser les segments créés ]
   # et on supprime les noms des lignes :
   rownames(group_segments) <- NULL #ça remet la numérotation
   # 
   # 
   # 
-  # On supprime la colonne cycle si on ne coupe pas les segments avec la moyenne : 
-  if (!cut_at_mean) group_segments[ , colnames(group_segments) == "cycle"] <- NULL
+  # On supprime la colonne ind si on ne coupe pas les segments avec la moyenne : 
+  if (!cut_at_mean) group_segments[ , colnames(group_segments) == "ind"] <- NULL
   # 
   # On supprime la colonne segment_no si on coupe avec les segments avec la moyenne : 
   if (cut_at_mean) group_segments[ , colnames(group_segments) == "segment_nb"] <- NULL

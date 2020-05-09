@@ -15,7 +15,7 @@ do_phases <- function(data, segments) {
   # 
   # On vérifie les colnames dans data : 
   if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
-    stop('data pas dans le bon format')
+    stop('data should have columns : id, hr and NegA')
   # 
   # 
   # On sélectionne les colonnes utiles : 
@@ -27,10 +27,10 @@ do_phases <- function(data, segments) {
   if (!all(c('id', 
              't1', 't2', 'diff_t', 
              'y1', 'y2', 'diff_y', 
-             'pente', 'ord_origine', 
-             'aire_2mean', 'aire_2min', 
+             'slope', 'intercept', 
+             'auc_to_mean', 'auc_to_min', 
              'mean_inter', 'segment_nb') %in% colnames(segments))) 
-    stop('segments pas dans le bon format')
+    stop('segments in wrong format')
   # 
   # 
   # 
@@ -69,7 +69,7 @@ do_phases <- function(data, segments) {
     # 
     # POUR LES PLATS : ====
     # 
-    boolean_plat_at_1 <- c(id_segments$pente == 0 & id_segments$ord_origine == id_min)*1
+    boolean_plat_at_1 <- c(id_segments$slope == 0 & id_segments$intercept == id_min)*1
     rle_plat_at_1 <- rle(boolean_plat_at_1)
     # 
     # 
@@ -99,29 +99,29 @@ do_phases <- function(data, segments) {
       i_y_fin  <- rev(iplat$y2)[1]
       i_diff_y <- i_y_fin-i_y_deb
       #
-      i_df_phase <- data.frame(id         = id, 
-                               t1         = i_t_deb,
-                               tn         = i_t_fin,
-                               diff_t     = i_diff_t,
-                               y1         = i_y_deb,
-                               yn         = i_y_fin,
-                               diff_y     = i_diff_y,
-                               pente_e    = i_diff_y/i_diff_t,
-                               pente_mean = mean(iplat$pente),
-                               pente_sd   = sd(iplat$pente),
-                               pente_max  = max(iplat$pente),
-                               pente_min  = min(iplat$pente),
-                               aire_2mean = sum(iplat$aire_2mean),
-                               aire_2min  = sum(iplat$aire_2min),
-                               cat        = 0)
+      i_df_phase <- data.frame(id          = id, 
+                               t1          = i_t_deb,
+                               tn          = i_t_fin,
+                               diff_t      = i_diff_t,
+                               y1          = i_y_deb,
+                               yn          = i_y_fin,
+                               diff_y      = i_diff_y,
+                               slope_e     = i_diff_y/i_diff_t,
+                               slope_mean  = mean(iplat$slope),
+                               slope_sd    = sd(iplat$slope),
+                               slope_max   = max(iplat$slope),
+                               slope_min   = min(iplat$slope),
+                               auc_to_mean = sum(iplat$auc_to_mean),
+                               auc_to_min  = sum(iplat$auc_to_min),
+                               cat         = 0)
     }))
     # 
     # 
     # 
     # POUR LES ASC. : ====
     # 
-    boolean_asc <- c((id_segments$pente >= 0 & id_segments$ord_origine != id_min) | 
-                       (id_segments$pente > 0 & id_segments$ord_origine == id_min & id_segments$t1 == 0))*1
+    boolean_asc <- c((id_segments$slope >= 0 & id_segments$intercept != id_min) | 
+                       (id_segments$slope > 0 & id_segments$intercept == id_min & id_segments$t1 == 0))*1
     rle_asc <- rle(boolean_asc)
     # 
     # 
@@ -135,10 +135,10 @@ do_phases <- function(data, segments) {
       i_deb <- seqs_ind_fins[i]
       i_lgh <- seqs_lenghts[i]
       if (i_lgh == 1) {
-        if (id_segments$pente[i_deb] == 0) return(NULL)
+        if (id_segments$slope[i_deb] == 0) return(NULL)
         return(id_segments[i_deb, ])
       } else {
-        if (all(id_segments$pente[c(i_deb-i_lgh+1):i_deb] == 0)) return(NULL)
+        if (all(id_segments$slope[c(i_deb-i_lgh+1):i_deb] == 0)) return(NULL)
         return(id_segments[c(i_deb-i_lgh+1):i_deb, ])
       }
     })
@@ -165,13 +165,13 @@ do_phases <- function(data, segments) {
                                y1         = i_y_deb,
                                yn         = i_y_fin,
                                diff_y     = i_diff_y,
-                               pente_e    = i_diff_y/i_diff_t,
-                               pente_mean = mean(iasc$pente),
-                               pente_sd   = sd(iasc$pente),
-                               pente_max  = max(iasc$pente),
-                               pente_min  = min(iasc$pente),
-                               aire_2mean = sum(iasc$aire_2mean),
-                               aire_2min  = sum(iasc$aire_2min),
+                               slope_e    = i_diff_y/i_diff_t,
+                               slope_mean = mean(iasc$slope),
+                               slope_sd   = sd(iasc$slope),
+                               slope_max  = max(iasc$slope),
+                               slope_min  = min(iasc$slope),
+                               auc_to_mean = sum(iasc$auc_to_mean),
+                               auc_to_min  = sum(iasc$auc_to_min),
                                cat        = 1)
     }))
     # 
@@ -179,8 +179,8 @@ do_phases <- function(data, segments) {
     # 
     # POUR LES DESC. : ====
     # 
-    boolean_desc <- c((id_segments$pente <= 0 & id_segments$ord_origine != id_min) | 
-                        (id_segments$pente < 0 & id_segments$ord_origine == id_min & id_segments$t1 == 0))*1
+    boolean_desc <- c((id_segments$slope <= 0 & id_segments$intercept != id_min) | 
+                        (id_segments$slope < 0 & id_segments$intercept == id_min & id_segments$t1 == 0))*1
     
     rle_desc <- rle(boolean_desc)
     # 
@@ -195,10 +195,10 @@ do_phases <- function(data, segments) {
       i_deb <- seqs_ind_fins[i]
       i_lgh <- seqs_lenghts[i]
       if (i_lgh == 1) {
-        if (id_segments$pente[i_deb] == 0) return(NULL)
+        if (id_segments$slope[i_deb] == 0) return(NULL)
         return(id_segments[i_deb, ])
       } else {
-        if (all(id_segments$pente[c(i_deb-i_lgh+1):i_deb] == 0)) return(NULL)
+        if (all(id_segments$slope[c(i_deb-i_lgh+1):i_deb] == 0)) return(NULL)
         return(id_segments[c(i_deb-i_lgh+1):i_deb, ])
       }
     })
@@ -231,13 +231,13 @@ do_phases <- function(data, segments) {
                                y1         = i_y_deb,
                                yn         = i_y_fin,
                                diff_y     = i_diff_y,
-                               pente_e    = i_diff_y/i_diff_t,
-                               pente_mean = mean(idesc$pente),
-                               pente_sd   = sd(idesc$pente),
-                               pente_max  = max(idesc$pente),
-                               pente_min  = min(idesc$pente),
-                               aire_2mean = sum(idesc$aire_2mean),
-                               aire_2min  = sum(idesc$aire_2min),
+                               slope_e    = i_diff_y/i_diff_t,
+                               slope_mean = mean(idesc$slope),
+                               slope_sd   = sd(idesc$slope),
+                               slope_max  = max(idesc$slope),
+                               slope_min  = min(idesc$slope),
+                               auc_to_mean = sum(idesc$auc_to_mean),
+                               auc_to_min  = sum(idesc$auc_to_min),
                                cat        = -1)
     }))
     # 

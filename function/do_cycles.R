@@ -17,10 +17,10 @@ do_cycles <- function(segments_cut) {
   if (!all(c('id', 
              't1', 't2', 'diff_t', 
              'y1', 'y2', 'diff_y', 
-             'pente', 'ord_origine', 
-             'aire_2mean', 'aire_2min', 
-             'cycle') %in% colnames(segments_cut)))
-    stop('segments_cut pas dans le bon format')
+             'slope', 'intercept', 
+             'auc_to_mean', 'auc_to_min', 
+             'ind') %in% colnames(segments_cut)))
+    stop('segments_cut in wrong format')
   # 
   # 
   # 
@@ -46,7 +46,7 @@ do_cycles <- function(segments_cut) {
     # 
     # 
     # On comptabilise le nombre de cycle : 
-    nb_cycle <- max(id_segments_cut$cycle)
+    nb_cycle <- max(id_segments_cut$ind)
     #   
     # 
     # 
@@ -59,7 +59,7 @@ do_cycles <- function(segments_cut) {
     for (icycle in 1:nb_cycle) {
       #
       # On récupère les caractéristiques des segments pour le cycle en cours : 
-      id_icycle_segs <- id_segments_cut[id_segments_cut$cycle == icycle, ]
+      id_icycle_segs <- id_segments_cut[id_segments_cut$ind == icycle, ]
       # 
       # 
       # Le nombre segment dans le cycle est : 
@@ -71,10 +71,10 @@ do_cycles <- function(segments_cut) {
                             y = c(id_icycle_segs$y1, id_icycle_segs$y2[seg_number])) # les valeurs des mesures 
       # 
       # 
-      # Toutes les variables que l'on veut :
-      t_debut   <- min(id_data$t) # le temps de début de cycle
-      t_fin     <- max(id_data$t) # le temps de fin de cycle
-      duree     <- t_fin - t_debut # la durée du cycle
+      # Toues les variables que l'on veut :
+      t1        <- min(id_data$t) # le temps de début de cycle
+      tn        <- max(id_data$t) # le temps de fin de cycle
+      duration  <- tn - t1 # la durée du cycle
       y_min     <- min(id_data$y) # le minimum du cycle
       y_max     <- max(id_data$y) # le maximum du cycle
       amplitude <- y_max - y_min # l'amplitude du cycle
@@ -82,61 +82,66 @@ do_cycles <- function(segments_cut) {
       #
       # PM : ligne suivante à revoir ?! 
       # Print if erreur sur signe dans id_icycle_segs$aire
-      u_signes <- unique(sign(id_icycle_segs$aire_2mean))
+      u_signes <- unique(sign(id_icycle_segs$auc_to_mean))
       if (length(u_signes) > 1 & all(u_signes != 0)) {
         print(paste("ID", id, ":", "cycle n°", icycle))
       }
       # 
       # 
       #
-      aire_2mean  <- sum(id_icycle_segs$aire_2mean)
-      aire_2min   <- sum(id_icycle_segs$aire_2min)
-      pente_debut <- id_icycle_segs$pente[1]
-      pente_fin   <- id_icycle_segs$pente[nrow(id_icycle_segs)]
+      auc_to_mean <- sum(id_icycle_segs$auc_to_mean)
+      auc_to_min  <- sum(id_icycle_segs$auc_to_min)
+      slope_debut <- id_icycle_segs$slope[1]
+      slope_fin   <- id_icycle_segs$slope[nrow(id_icycle_segs)]
       # 
       #
       # Si l'aire est positive :
-      if (aire_2mean > 0) {
+      if (auc_to_mean > 0) {
         type   <- 1
         t_ypic <- id_data$t[id_data$y == y_max]
         
         # S'il y a un pic max pour le cycle :
         if (length(t_ypic) == 1) {
-          pente_debutM <- (y_max - id_data$y[1])/(t_ypic - id_icycle_segs$t1[1])
-          pente_finM   <- (id_data$y[nrow(id_data)] - y_max)/(id_icycle_segs$t2[nrow(id_icycle_segs)] - t_ypic)
+          slope_t1M <- (y_max - id_data$y[1])/(t_ypic - id_icycle_segs$t1[1])
+          slope_tnM   <- (id_data$y[nrow(id_data)] - y_max)/(id_icycle_segs$t2[nrow(id_icycle_segs)] - t_ypic)
         }
         #
         # S'il y a plusieurs pic max pour le cycle :
         if (length(t_ypic) != 1) {
-          pente_debutM <- (y_max - id_data$y[1])/(t_ypic[1] - id_icycle_segs$t1[1])
-          pente_finM   <- (id_data$y[nrow(id_data)] - y_max)/(id_icycle_segs$t2[nrow(id_icycle_segs)] - t_ypic[length(t_ypic)])
+          slope_t1M <- (y_max - id_data$y[1])/(t_ypic[1] - id_icycle_segs$t1[1])
+          slope_tnM   <- (id_data$y[nrow(id_data)] - y_max)/(id_icycle_segs$t2[nrow(id_icycle_segs)] - t_ypic[length(t_ypic)])
         }
       }
       #
       # Si l'aire est négative :
-      if (aire_2mean < 0) {
+      if (auc_to_mean < 0) {
         type   <- -1
         t_ypic <- id_data$t[id_data$y == y_min]
         
         # S'il y a un pic min pour le cycle :
         if (length(t_ypic) == 1) {
-          pente_debutM <- (y_min - id_data$y[1])/(t_ypic - id_data$t[1])
-          pente_finM   <- (id_data$y[nrow(id_data)] - y_min)/(id_data$t[nrow(id_data)] - t_ypic)
+          slope_t1M <- (y_min - id_data$y[1])/(t_ypic - id_data$t[1])
+          slope_tnM   <- (id_data$y[nrow(id_data)] - y_min)/(id_data$t[nrow(id_data)] - t_ypic)
         }
         
         # S'il y a plusieurs pic min pour le cycle :
         if (length(t_ypic) != 1) {
-          pente_debutM <- (y_min - id_data$y[1])/(t_ypic[1] - id_data$t[1])
-          pente_finM   <- (id_data$y[nrow(id_data)] - y_min)/(id_data$t[nrow(id_data)] - t_ypic[length(t_ypic)])
+          slope_t1M <- (y_min - id_data$y[1])/(t_ypic[1] - id_data$t[1])
+          slope_tnM   <- (id_data$y[nrow(id_data)] - y_min)/(id_data$t[nrow(id_data)] - t_ypic[length(t_ypic)])
         }
       }
       #
-      id_icycle <- c(id, type, t_debut, t_fin, duree, y_min, y_max, amplitude, pente_debut, pente_debutM, pente_fin, pente_finM, aire_2mean, aire_2min)
+      id_icycle <- c(id, type, t1, tn, duration, y_min, y_max, amplitude, slope_debut, slope_t1M, slope_fin, slope_tnM, auc_to_mean, auc_to_min)
       #
       id_cycles <- rbind.data.frame(id_cycles, id_icycle)
       #
     }
-    colnames(id_cycles) <- c("id", "type", "t_debut", "t_fin", "duree", "y_min", "y_max", "amplitude", "pente_debut", "pente_debutM", "pente_fin", "pente_finM", "aire_2mean", "aire_2min")
+    colnames(id_cycles) <- c("id", "type", 
+                             "t1", "tn", "duration", 
+                             "y_min", "y_max", "amplitude", 
+                             "slope_t1", "slope_t1M", 
+                             "slope_tn", "slope_tnM", 
+                             "auc_to_mean", "auc_to_min")
     rownames(id_cycles) <- NULL
     # 
     # 
@@ -153,10 +158,8 @@ do_cycles <- function(segments_cut) {
   }
   # 
   # 
-  # 
-  # 
   # et on sauvegarde : 
   return(group_cycles)
   # 
+  # 
 }
-# 
