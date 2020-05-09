@@ -1,7 +1,6 @@
 #' Title
 #'
 #' @param data 
-#' @param cycles 
 #' @param id 
 #' @param save_at 
 #' @param do_legend 
@@ -10,7 +9,7 @@
 #' @export
 #'
 #' @examples
-plot_cycles <- function(data, cycles, id, save_at = NULL, do_legend = TRUE) {
+plot_cycles <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On vérifie qu'il n'y a qu'un id sélectionné : 
@@ -31,21 +30,10 @@ plot_cycles <- function(data, cycles, id, save_at = NULL, do_legend = TRUE) {
   data <- data[ , c('id', 'hr', 'NegA')]
   # 
   # 
-  # On vérifie les colnames dans cycles : 
-  if (!all(c('id', 
-             't1', 'tn', 'duration', 
-             'y_min', 'y_max', 'amplitude', 
-             'slope_t1', 'slope_t1M', 
-             'slope_tn', 'slope_tnM', 
-             'auc_to_mean', 'auc_to_min', 
-             'cycle_nb') %in% colnames(cycles))) 
-    stop('cycles pas in wrong format')
-  # 
-  # 
   # On sélectionne les données pour l'id sélectionné : 
   id_data   <- data[data$id == id, ]
   id_segs   <- do_segments(data = id_data, cut_at_mean = TRUE)
-  id_cycles <- cycles[cycles$id == id, ]
+  id_cycles <- do_cycles(data = id_data)
   # 
   # 
   # On calcule la moyenne de l'id sélectionné : 

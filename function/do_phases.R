@@ -1,7 +1,6 @@
 #' Title
 #'
 #' @param data 
-#' @param segments 
 #'
 #' @return
 #' @export
@@ -10,7 +9,7 @@
 #' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
-do_phases <- function(data, segments) {
+do_phases <- function(data) {
   # 
   # 
   # On vérifie les colnames dans data : 
@@ -23,19 +22,8 @@ do_phases <- function(data, segments) {
   # 
   # 
   # 
-  # On vérifie les colnames dans segments : 
-  if (!all(c('id', 
-             't1', 't2', 'diff_t', 
-             'y1', 'y2', 'diff_y', 
-             'slope', 'intercept', 
-             'auc_to_mean', 'auc_to_min', 
-             'mean_inter', 'segment_nb') %in% colnames(segments))) 
-    stop('segments in wrong format')
-  # 
-  # 
-  # 
   # La liste des id :
-  list_id <- unique(segments$id)
+  list_id <- unique(data$id)
   # 
   # 
   # 
@@ -56,7 +44,7 @@ do_phases <- function(data, segments) {
     # 
     # On récupère les données de l'id en cours : 
     id_data     <- data[data$id == id, ]
-    id_segments <- segments[segments$id == id, ]
+    id_segments <- do_segments(id_data, cut_at_mean = FALSE)
     id_min      <- min(id_data$NegA)
     # -1: pour supprimer la colonne contenant la valeur de l'id, on ne garde que 
     # les colonnes minr et NegA

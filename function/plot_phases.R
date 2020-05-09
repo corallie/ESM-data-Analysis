@@ -1,8 +1,6 @@
 #' Title
 #'
 #' @param data 
-#' @param segments 
-#' @param phases 
 #' @param id 
 #' @param save_at 
 #' @param do_legend 
@@ -11,7 +9,7 @@
 #' @export
 #'
 #' @examples
-plot_phases <- function(data, segments, phases, id, save_at = NULL, do_legend = TRUE) {
+plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On vérifie qu'il n'y a qu'un id sélectionné : 
@@ -28,30 +26,10 @@ plot_phases <- function(data, segments, phases, id, save_at = NULL, do_legend = 
   data <- data[ , c('id', 'hr', 'NegA')]
   # 
   # 
-  # On vérifie les colnames dans segments : 
-  if (!all(c('id', 
-             't1', 't2', 'diff_t', 
-             'y1', 'y2', 'diff_y', 
-             'slope', 'intercept', 
-             'auc_to_mean', 'auc_to_min', 
-             'mean_inter', 'segment_nb') %in% colnames(segments))) 
-    stop('segments in wrong format')
-  # 
-  # 
-  # On vérifie les colnames dans phases : 
-  if (!all(c('id', 
-             't1', 'tn', 'diff_t', 
-             'y1', 'yn', 'diff_y', 
-             'slope_e', 'slope_mean', 'slope_sd', 'slope_max', 'slope_min', 
-             'auc_to_mean', 'auc_to_min', 
-             'cat', 'phase_nb') %in% colnames(phases)))
-    stop('phases in wrong format') 
-  # 
-  # 
   # On sélectionne les données pour l'id sélectionné : 
   id_data   <- data[data$id == id, ]
-  id_segs   <- segments[segments$id == id, ]
-  id_phases <- phases[phases$id == id, ]
+  id_segs   <- do_segments(data = id_data, cut_at_mean = FALSE)
+  id_phases <- do_phases(data = id_data)
   # 
   # 
   # On calcule la moyenne de l'id sélectionné : 

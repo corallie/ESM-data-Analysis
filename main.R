@@ -13,7 +13,7 @@
 # the right place where data and function can be read and where figures and 
 # tables can be saved. 
 # If your ESM monitoring is not sampled 5 times a day and with levels from 1 to
-# 10, updates have to be done in functions files. 
+# 10, functions need to be updated. 
 # 
 #' ____________________________________________________________________________
 # 
@@ -110,8 +110,7 @@ write.csv(summary_segments,
 # 
 # 
 # Compute features of each phases : 
-phases <- do_phases(data = simulated_data, 
-                    segments = segments)
+phases <- do_phases(data = simulated_data)
 # and save : 
 write.csv(phases, 
           file = paste0(data_folder, "phases.csv"), row.names = F)
@@ -119,13 +118,9 @@ write.csv(phases,
 # 
 # Visualize phases : 
 plot_phases(data = simulated_data, 
-            segments = segments, 
-            phases = phases, 
             id = 1)
 # and save : 
 plot_phases(data = simulated_data, 
-            segments = segments, 
-            phases = phases, 
             id = 1, 
             save_at = figure_folder)
 # 
@@ -139,7 +134,7 @@ write.csv(summary_phases,
 # 
 #' ____________________________________________________________________________
 # 
-# CYCLES ====
+# CYCLES                                                                       ====
 # 
 # 
 # Compute features of each cycles : 
@@ -151,11 +146,9 @@ write.csv(cycles,
 # 
 # Visualize cycles : 
 plot_cycles(data = simulated_data, 
-            cycles = cycles, 
             id = 1)
 # and save : 
 plot_cycles(data = simulated_data,
-            cycles = cycles, 
             id = 1, 
             save_at = figure_folder)
 # 
