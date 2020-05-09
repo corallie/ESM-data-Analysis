@@ -30,6 +30,10 @@ graphics.off()
 # Source functions ====
 # 
 # 
+# for hr
+source("./function/do_hr.R")
+# 
+# 
 # for segments 
 source('./function/do_segments.R') 
 source('./function/plot_segments.R') 
@@ -59,6 +63,11 @@ data_folder <- "./data/"
 # 
 # Read data : 
 simulated_data <- read.csv(paste0(data_folder, "simulated_NegA_group.csv"))
+# 
+# 
+# Add a column with the cumulative hours from the start of the monitoring :
+simulated_data$hr <- do_hr(data = simulated_data, 
+                           format = "%Y-%m-%d %H:%M:%S")
 # 
 # 
 # Visualize data : 
