@@ -95,11 +95,6 @@ do_phases <- function(data) {
                                yn          = i_y_fin,
                                diff_y      = i_diff_y,
                                slope_e     = i_diff_y/i_diff_t,
-                               slope_mean  = mean(iplat$slope),
-                               slope_sd    = sd(iplat$slope),
-                               slope_max   = max(iplat$slope),
-                               slope_min   = min(iplat$slope),
-                               auc_to_mean = sum(iplat$auc_to_mean),
                                auc_to_min  = sum(iplat$auc_to_min),
                                cat         = 0)
     }))
@@ -146,21 +141,16 @@ do_phases <- function(data) {
       i_y_fin  <- rev(iasc$y2)[1]
       i_diff_y <- i_y_fin-i_y_deb
       #
-      i_df_phase <- data.frame(id         = id, 
-                               t1         = i_t_deb,
-                               tn         = i_t_fin,
-                               diff_t     = i_diff_t,
-                               y1         = i_y_deb,
-                               yn         = i_y_fin,
-                               diff_y     = i_diff_y,
-                               slope_e    = i_diff_y/i_diff_t,
-                               slope_mean = mean(iasc$slope),
-                               slope_sd   = sd(iasc$slope),
-                               slope_max  = max(iasc$slope),
-                               slope_min  = min(iasc$slope),
-                               auc_to_mean = sum(iasc$auc_to_mean),
+      i_df_phase <- data.frame(id          = id, 
+                               t1          = i_t_deb,
+                               tn          = i_t_fin,
+                               diff_t      = i_diff_t,
+                               y1          = i_y_deb,
+                               yn          = i_y_fin,
+                               diff_y      = i_diff_y,
+                               slope_e     = i_diff_y/i_diff_t,
                                auc_to_min  = sum(iasc$auc_to_min),
-                               cat        = 1)
+                               cat         = 1)
     }))
     # 
     # 
@@ -212,21 +202,16 @@ do_phases <- function(data) {
       i_y_fin  <- rev(idesc$y2)[1]
       i_diff_y <- i_y_fin-i_y_deb
       #
-      i_df_phase <- data.frame(id         = id, 
-                               t1         = i_t_deb,
-                               tn         = i_t_fin,
-                               diff_t     = i_diff_t,
-                               y1         = i_y_deb,
-                               yn         = i_y_fin,
-                               diff_y     = i_diff_y,
-                               slope_e    = i_diff_y/i_diff_t,
-                               slope_mean = mean(idesc$slope),
-                               slope_sd   = sd(idesc$slope),
-                               slope_max  = max(idesc$slope),
-                               slope_min  = min(idesc$slope),
-                               auc_to_mean = sum(idesc$auc_to_mean),
+      i_df_phase <- data.frame(id          = id, 
+                               t1          = i_t_deb,
+                               tn          = i_t_fin,
+                               diff_t      = i_diff_t,
+                               y1          = i_y_deb,
+                               yn          = i_y_fin,
+                               diff_y      = i_diff_y,
+                               slope_e     = i_diff_y/i_diff_t,
                                auc_to_min  = sum(idesc$auc_to_min),
-                               cat        = -1)
+                               cat         = -1)
     }))
     # 
     # On regroupe tout dans le même objet : 

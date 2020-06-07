@@ -90,40 +90,17 @@ do_cycles <- function(data = data) {
       # Si l'aire est positive :
       if (auc_to_mean > 0) {
         type   <- 1
-        t_ypic <- id_data$t[id_data$y == y_max]
-        
-        # S'il y a un pic max pour le cycle :
-        if (length(t_ypic) == 1) {
-          slope_t1M <- (y_max - id_data$y[1])/(t_ypic - id_icycle_segs$t1[1])
-          slope_tnM   <- (id_data$y[nrow(id_data)] - y_max)/(id_icycle_segs$t2[nrow(id_icycle_segs)] - t_ypic)
-        }
-        #
-        # S'il y a plusieurs pic max pour le cycle :
-        if (length(t_ypic) != 1) {
-          slope_t1M <- (y_max - id_data$y[1])/(t_ypic[1] - id_icycle_segs$t1[1])
-          slope_tnM   <- (id_data$y[nrow(id_data)] - y_max)/(id_icycle_segs$t2[nrow(id_icycle_segs)] - t_ypic[length(t_ypic)])
-        }
       }
       #
       # Si l'aire est négative :
       if (auc_to_mean < 0) {
         type   <- -1
-        t_ypic <- id_data$t[id_data$y == y_min]
-        
-        # S'il y a un pic min pour le cycle :
-        if (length(t_ypic) == 1) {
-          slope_t1M <- (y_min - id_data$y[1])/(t_ypic - id_data$t[1])
-          slope_tnM   <- (id_data$y[nrow(id_data)] - y_min)/(id_data$t[nrow(id_data)] - t_ypic)
-        }
-        
-        # S'il y a plusieurs pic min pour le cycle :
-        if (length(t_ypic) != 1) {
-          slope_t1M <- (y_min - id_data$y[1])/(t_ypic[1] - id_data$t[1])
-          slope_tnM   <- (id_data$y[nrow(id_data)] - y_min)/(id_data$t[nrow(id_data)] - t_ypic[length(t_ypic)])
-        }
       }
       #
-      id_icycle <- c(id, type, t1, tn, duration, y_min, y_max, amplitude, slope_debut, slope_t1M, slope_fin, slope_tnM, auc_to_mean, auc_to_min)
+      id_icycle <- c(id, type, 
+                     t1, tn, duration, 
+                     y_min, y_max, amplitude,
+                     auc_to_mean)
       #
       id_cycles <- rbind.data.frame(id_cycles, id_icycle)
       #
@@ -131,9 +108,7 @@ do_cycles <- function(data = data) {
     colnames(id_cycles) <- c("id", "type", 
                              "t1", "tn", "duration", 
                              "y_min", "y_max", "amplitude", 
-                             "slope_t1", "slope_t1M", 
-                             "slope_tn", "slope_tnM", 
-                             "auc_to_mean", "auc_to_min")
+                             "auc_to_mean")
     rownames(id_cycles) <- NULL
     # 
     # 
