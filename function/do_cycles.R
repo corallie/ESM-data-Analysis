@@ -5,7 +5,7 @@
 #' @return
 #' @export
 #' 
-#' @author Coralie Vennin, \email{??}
+#' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
 #' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
