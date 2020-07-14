@@ -5,6 +5,9 @@
 #'
 #' @return
 #' @export
+#' 
+#' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
+#' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
 table_cycles <- function(cycles, save_at = NULL) {

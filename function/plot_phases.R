@@ -7,6 +7,9 @@
 #'
 #' @return
 #' @export
+#' 
+#' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
+#' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
 plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
@@ -18,12 +21,12 @@ plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On vérifie les colnames dans data : 
-  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
-    stop('data should have columns : id, hr and NegA')
+  if (!all(c('id', 'hr', 'LSNAI') %in% colnames(data))) 
+    stop('data should have columns : id, hr and LSNAI')
   # 
   # 
   # On sélectionne les colonnes utiles : 
-  data <- data[ , c('id', 'hr', 'NegA')]
+  data <- data[ , c('id', 'hr', 'LSNAI')]
   # 
   # 
   # On sélectionne les données pour l'id sélectionné : 
@@ -33,7 +36,7 @@ plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On calcule la moyenne de l'id sélectionné : 
-  id_mean <- mean(id_data$NegA)
+  id_mean <- mean(id_data$LSNAI)
   # 
   # 
   # Le cas échéant, on enregistre le graphique dans le pdf : 
@@ -42,14 +45,14 @@ plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # Initialisation des paramètres du graphique : 
-  par(las = 1, mar = c(4, 4, 2, 4))
+  par(las = 1, mar = c(4, 5, 2, 4))
   # 
   # 
   # Initialisation du graphique : 
   plot(x = range(id_data$hr), 
-       y = range(id_data$NegA), 
+       y = range(id_data$LSNAI), 
        xlab = 'Hours since the start of ESM', 
-       ylab = 'Intensity of negative affect', 
+       ylab = 'Level of simultated\nnegative affect intensity', 
        yaxt = 'n',
        type = 'n', 
        lty = 2, 
@@ -74,7 +77,7 @@ plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
     for (iirow in 1:nrow(i_seg_up)) {
       ii_seg_up <- i_seg_up[iirow, ]
       polygon(x = c(ii_seg_up$t1, ii_seg_up$t2, ii_seg_up$t2, ii_seg_up$t1), 
-              y = c(ii_seg_up$y1, ii_seg_up$y2, rep(min(id_data$NegA), 2)), 
+              y = c(ii_seg_up$y1, ii_seg_up$y2, rep(min(id_data$LSNAI), 2)), 
               col = 'red', border = "transparent")
     }
   }
@@ -90,7 +93,7 @@ plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
     for (iirow in 1:nrow(i_seg_down)) {
       ii_seg_down <- i_seg_down[iirow, ]
       polygon(x = c(ii_seg_down$t1, ii_seg_down$t2, ii_seg_down$t2, ii_seg_down$t1), 
-              y = c(ii_seg_down$y1, ii_seg_down$y2, rep(min(id_data$NegA), 2)), 
+              y = c(ii_seg_down$y1, ii_seg_down$y2, rep(min(id_data$LSNAI), 2)), 
               col = 'blue', border = "transparent")
     }
   }
@@ -98,7 +101,7 @@ plot_phases <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # Rajout des points de mesures du suivi : 
   points(x = id_data$hr, 
-         y = id_data$NegA, 
+         y = id_data$LSNAI, 
          type = 'o', 
          col = ifelse(id == 2,'black','black'), 
          pch = ifelse(id == 2,4,1), 

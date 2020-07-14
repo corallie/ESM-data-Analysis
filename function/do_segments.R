@@ -14,12 +14,12 @@ do_segments <- function(data, cut_at_mean = FALSE) {
   # 
   # 
   # On vérifie les colnames dans data : 
-  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
-    stop('data should have columns : id, hr and NegA')
+  if (!all(c('id', 'hr', 'LSNAI') %in% colnames(data))) 
+    stop('data should have columns : id, hr and LSNAI')
   # 
   # 
   # On sélectionne les colonnes : 
-  data <- data[ , c('id', 'hr', 'NegA')]
+  data <- data[ , c('id', 'hr', 'LSNAI')]
   # 
   # 
   # La liste des id :
@@ -35,16 +35,16 @@ do_segments <- function(data, cut_at_mean = FALSE) {
     # 
     # 
     # On récupère les données de l'id en cours : 
-    id_data     <- data[data$id == id, -1]
+    id_data <- data[data$id == id, -1]
     # -1: pour supprimer la colonne contenant la valeur de l'id, on ne garde que 
-    # les colonnes hr et NegA
+    # les colonnes hr et LSNAI
     # 
     # 
     # On calcule sa moyenne et son écart-type : 
-    id_mean <- mean(id_data$NegA)
-    id_sd <- sd(id_data$NegA)
+    id_mean <- mean(id_data$LSNAI)
+    id_sd <- sd(id_data$LSNAI)
     # mais aussi, la valeur minimale :
-    id_min <- min(id_data$NegA)
+    id_min <- min(id_data$LSNAI)
     # 
     # 
     # On calcule le nombre de segment : 
@@ -71,8 +71,8 @@ do_segments <- function(data, cut_at_mean = FALSE) {
       diff_t <- t2 - t1
       # 
       # Les valeurs du suivi associées : 
-      y1 <- id_data$NegA[i_segment]
-      y2 <- id_data$NegA[i_segment+1]
+      y1 <- id_data$LSNAI[i_segment]
+      y2 <- id_data$LSNAI[i_segment+1]
       # et la différence des deux valeurs : 
       diff_y <- y2 - y1
       # 

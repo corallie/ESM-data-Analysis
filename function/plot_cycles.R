@@ -7,6 +7,9 @@
 #'
 #' @return
 #' @export
+#' 
+#' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
+#' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
 plot_cycles <- function(data, id, save_at = NULL, do_legend = TRUE) {
@@ -22,12 +25,12 @@ plot_cycles <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On vérifie les colnames dans data : 
-  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
-    stop('data should have columns : id, hr and NegA')
+  if (!all(c('id', 'hr', 'LSNAI') %in% colnames(data))) 
+    stop('data should have columns : id, hr and LSNAI')
   # 
   # 
   # On sélectionne les colonnes utiles : 
-  data <- data[ , c('id', 'hr', 'NegA')]
+  data <- data[ , c('id', 'hr', 'LSNAI')]
   # 
   # 
   # On sélectionne les données pour l'id sélectionné : 
@@ -37,7 +40,7 @@ plot_cycles <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On calcule la moyenne de l'id sélectionné : 
-  id_mean <- mean(id_data$NegA)
+  id_mean <- mean(id_data$LSNAI)
   # 
   # 
   # Le cas échéant, on enregistre le graphique dans le pdf : 
@@ -45,14 +48,14 @@ plot_cycles <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # Initialisation des paramètres du graphique : 
-  par(las = 1, mar = c(4, 4, 2, 3))
+  par(las = 1, mar = c(4, 5, 2, 3))
   # 
   # 
   # Initialisation du graphique : 
   plot(x = range(id_data$hr), 
-       y = range(id_data$NegA), 
+       y = range(id_data$LSNAI), 
        xlab = 'Hours since the start of ESM', 
-       ylab = 'Intensity of negative affect', 
+       ylab = 'Level of simultated\nnegative affect intensity', 
        yaxt = 'n',
        type = 'n', 
        lty = 2, 
@@ -96,7 +99,7 @@ plot_cycles <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # Rajout des points de mesures du suivi : 
   points(x = id_data$hr, 
-         y = id_data$NegA, 
+         y = id_data$LSNAI, 
          type = 'o', 
          col = ifelse(id == 2,'black','black'), 
          pch = ifelse(id == 2,4,1), 

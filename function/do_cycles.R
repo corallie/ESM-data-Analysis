@@ -34,7 +34,7 @@ do_cycles <- function(data = data) {
     # On récupère les données de l'id en cours : 
     id_segments_cut <- segments_cut[segments_cut$id == id, -1]
     # -1: pour supprimer la colonne contenant la valeur de l'id, on ne garde que 
-    # les colonnes minr et NegA
+    # les colonnes minr et LSNAI
     # 
     # 
     # On comptabilise le nombre de cycle : 

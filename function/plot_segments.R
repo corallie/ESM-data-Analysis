@@ -7,6 +7,9 @@
 #'
 #' @return
 #' @export
+#' 
+#' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
+#' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
 plot_segments <- function(data, id, save_at = NULL, do_legend = TRUE) {
@@ -18,8 +21,8 @@ plot_segments <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On vérifie les colnames dans data : 
-  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
-    stop('data should have columns : id, hr and NegA')
+  if (!all(c('id', 'hr', 'LSNAI') %in% colnames(data))) 
+    stop('data should have columns : id, hr and LSNAI')
   # 
   # 
   # On sélectionne les données pour l'id sélectionné : 
@@ -27,8 +30,8 @@ plot_segments <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # On calcule la moyenne et l'écar-type de l'id sélectionné : 
-  means  <- mean(id_data$NegA)
-  sds    <- sd(id_data$NegA)
+  means  <- mean(id_data$LSNAI)
+  sds    <- sd(id_data$LSNAI)
   # 
   # 
   # Le cas échéant, on enregistre le graphique dans le pdf : 
@@ -36,14 +39,14 @@ plot_segments <- function(data, id, save_at = NULL, do_legend = TRUE) {
   # 
   # 
   # Initialisation des paramètres du graphique : 
-  par(las = 1, mar = c(4, 4, 2, 4))
+  par(las = 1, mar = c(4, 5, 2, 4))
   # 
   # 
   # Initialisation du graphique : 
   plot(x = id_data$hr, 
-       y = id_data$NegA, 
+       y = id_data$LSNAI, 
        xlab = 'Hours since the start of ESM', 
-       ylab = 'Intensity of negative affect', 
+       ylab = 'Level of simultated\nnegative affect intensity', 
        yaxt = 'n', 
        col = 'black', 
        type = 'o', ylim = c(0.5, 10)) 

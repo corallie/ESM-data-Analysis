@@ -13,12 +13,12 @@ do_phases <- function(data) {
   # 
   # 
   # On vérifie les colnames dans data : 
-  if (!all(c('id', 'hr', 'NegA') %in% colnames(data))) 
-    stop('data should have columns : id, hr and NegA')
+  if (!all(c('id', 'hr', 'LSNAI') %in% colnames(data))) 
+    stop('data should have columns : id, hr and LSNAI')
   # 
   # 
   # On sélectionne les colonnes utiles : 
-  data <- data[ , c('id', 'hr', 'NegA')]
+  data <- data[ , c('id', 'hr', 'LSNAI')]
   # 
   # 
   # 
@@ -45,9 +45,9 @@ do_phases <- function(data) {
     # On récupère les données de l'id en cours : 
     id_data     <- data[data$id == id, ]
     id_segments <- do_segments(id_data, cut_at_mean = FALSE)
-    id_min      <- min(id_data$NegA)
+    id_min      <- min(id_data$LSNAI)
     # -1: pour supprimer la colonne contenant la valeur de l'id, on ne garde que 
-    # les colonnes minr et NegA
+    # les colonnes minr et LSNAI
     # 
     # 
     # On réinitialise les noms de lignes pour qu'elles soient numérotées de 1 à nrow(id_segments)
@@ -243,8 +243,6 @@ do_phases <- function(data) {
   # 
   # 
 }
-# 
-# 
 # 
 # 
 # 
