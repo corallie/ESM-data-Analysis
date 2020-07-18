@@ -62,7 +62,7 @@ data_folder <- "./data/"
 # 
 # 
 # Read data : 
-simulated_data <- read.csv(paste0(data_folder, "simulated_NegA_group.csv"))
+simulated_data <- read.csv(paste0(data_folder, "simulated_LSNAI_group.csv"))
 # 
 # 
 # Add a column with the cumulative hours from the start of the monitoring :
