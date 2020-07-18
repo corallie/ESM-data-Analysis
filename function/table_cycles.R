@@ -1,7 +1,7 @@
-#' Title
+#' Cycles summary by id
 #'
-#' @param phases 
-#' @param save_at 
+#' @param cycles a data.frame object of the cycles of the ESM data. 
+#' @param save_at the path where to save the table (path + file name.csv)
 #'
 #' @return
 #' @export
@@ -13,7 +13,7 @@
 table_cycles <- function(cycles, save_at = NULL) {
   # 
   # 
-  # Caractéristiques des cycles :
+  # Features of cycles
   cycles_nb        <- tapply(cycles$cycle, cycles$id, length)
   cycles_auc_tot   <- tapply(cycles$auc_to_mean, cycles$id, sum)
   cycles_dur_tot   <- tapply(cycles$duration, cycles$id, sum)
@@ -21,11 +21,11 @@ table_cycles <- function(cycles, save_at = NULL) {
   cycles_ymax_max  <- tapply(cycles$y_max, cycles$id, max)
   # 
   # 
-  # On regroupe le tout : 
+  # Group all features together
   cycles_features <- rbind(cycles_nb, cycles_auc_tot, cycles_dur_tot, cycles_ymax_mean, cycles_ymax_max)
   # 
   # 
-  # On rajoute id dans le nom de colonne pour que ça soit bien explicite : 
+  # Add id in colnames
   colnames(cycles_features) <- paste0("id_", colnames(cycles_features))
   # 
   # 

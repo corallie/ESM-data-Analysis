@@ -3,7 +3,7 @@
 #' @param data a data.frame object of the ESM data described by at least three columns : id, hr and LSNAI. See do_hr to compute hr (ellapsed hours since the monitoring beginning of each id).
 #' @param cut_at_mean a boolean set to FALSE. If TRUE, segments goint through the id LSNAI mean are cut in two, creating a fictif point at the id mean. 
 #'
-#' @return a data.frame object of the ESM data's segments and their features by id. 
+#' @return a data.frame object of the ESM data's segments and their features by id.
 #' @export
 #' 
 #' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
@@ -26,7 +26,7 @@ do_segments <- function(data, cut_at_mean = FALSE) {
   list_id <- unique(data$id)
   # 
   # 
-  # Init function output containing segments features of all id
+  # Initialisation of the function output containing segments features of all id
   group_segments <- NULL
   # 
   # 
@@ -50,11 +50,11 @@ do_segments <- function(data, cut_at_mean = FALSE) {
     nb_segment <- nrow(id_data)-1
     # 
     # 
-    # Init id output containing its segments features 
+    # Initialisation of the id output containing its segments features 
     id_segments <- NULL
     # 
     # 
-    # Init variable which allows to cycles computation
+    # Initialisation of the variable which allows to cycles computation
     ind <- 1
     # (not working/usefull for no_cut_segments = TRUE)
     # 
@@ -81,7 +81,7 @@ do_segments <- function(data, cut_at_mean = FALSE) {
       intercept <- (t2*y1 - t1*y2) / diff_t
       # 
       # 
-      # For the calculation of the cycles, we have to cut segments in half if they cross the line of the id's average. 
+      # For the calculation of the cycles, we have to cut segments in two if they cross the line of the id's average. 
       # So we need to know about the current segment: 
       # Does the segment cross the line of the individual's average? 
       boolean_cross_mean <- (y2 > id_mean) - (y1 > id_mean)
@@ -89,112 +89,118 @@ do_segments <- function(data, cut_at_mean = FALSE) {
       # > boolean_cross_mean != 0 : it does
       # 
       # 
-      # If segments 
-      if (!cut_at_mean | boolean_cross_mean == 0) { 
+      # If we do not cut at mean 
+      if (!cut_at_mean | 
+          # or if segments does not cross the id's average 
+          boolean_cross_mean == 0) { 
         # 
         # 
-        # On calcule l'aire entre la courbe et la moyenne de l'individu :
-        aire_slc <- pracma::trapz(x = c(t1, t2), 
-                                  y = c(y1 - id_mean, y2 - id_mean))
+        # Compute area under the curve until the mean
+        auc_to_mean <- pracma::trapz(x = c(t1, t2), 
+                                     y = c(y1 - id_mean, y2 - id_mean))
         # 
         # 
-        # On calcule l'aire entre la courbe et le niveau le plus bas de l'individu :
-        aire_ymin <- pracma::trapz(x = c(t1, t2), 
-                                   y = c(y1 - id_min, y2 - id_min))
+        # Compute area under the curve until the id min
+        auc_to_min <- pracma::trapz(x = c(t1, t2), 
+                                    y = c(y1 - id_min, y2 - id_min))
         # 
         # 
-        # On reste dans le même cycle :
+        # Same cycle, ind stay the same
         ind <- ind
         # 
         # 
-        # On regroupe les informations du segment en cours : 
-        id_segment <- c(id, t1, t2, diff_t, y1, y2, diff_y, slope, intercept, aire_slc, aire_ymin, ind, boolean_cross_mean)
+        # Group segment features together 
+        id_segment <- c(id, t1, t2, diff_t, y1, y2, diff_y, slope, intercept, auc_to_mean, auc_to_min, ind, boolean_cross_mean)
         # 
         # 
-        # On les sauvegarde les caractéristiques du segment en cours dans la variable id_segments : 
+        # Add segment features into id output (id_segments)
         id_segments <- rbind(id_segments, id_segment)
         # 
         # 
-      } else if (cut_at_mean & boolean_cross_mean != 0) { #Si le segment traverse la moyenne
-        # 
-        # 
-        # On va devoir couper le segment, le point de coupe est en : 
-        y <- id_mean #y = la moyenne
-        t <- (y - intercept) / slope #t = hr pour lequel on passe par la moyenne
-        # 
-        # 
-        # On calcule les différences avant la moyenne :  
-        diff_t_avmoy <- t - t1
-        diff_y_avmoy <- id_mean - y1
-        # et après la moyenne !
-        diff_t_apmoy <- t2 - t
-        diff_y_apmoy <- y2 - id_mean
-        # 
-        # mais aussi les aires entre la courbe du suivi et la moyenne : 
-        aire_slc_avmoy <- pracma::trapz(x = c(t1, t),
-                                        y = c(y1 - id_mean, 0))
-        aire_slc_apmoy <- pracma::trapz(x = c(t, t2),
-                                        y = c(0, y2 - id_mean))
-        # 
-        # 
-        # et les aires entre la courbe du suivi et la valeur minimale : 
-        aire_ymin_avmoy <- pracma::trapz(x = c(t1, t),
-                                         y = c(y1 - id_min, 0))
-        aire_ymin_apmoy <- pracma::trapz(x = c(t, t2),
-                                         y = c(0, y2 - id_min))
-        # 
-        # 
-        # 
-        # On regroupe les informations du segment en cours, soit : 
-        # 1) la partie avant la moyenne (cycle le même que le précédent) : 
-        id_segment_avmoy <- c(id, t1, t, diff_t_avmoy, y1, y, diff_y_avmoy, slope, intercept, aire_slc_avmoy, aire_ymin_avmoy, ind, boolean_cross_mean)
-        # 2) la partie après la moyenne (on entre dans un nouveau cycle) : 
-        ind <- ind + 1
-        id_segment_apmoy <- c(id, t, t2, diff_t_apmoy, y, y2, diff_y_apmoy, slope, intercept, aire_slc_apmoy, aire_ymin_apmoy, ind, boolean_cross_mean)
-        # 
-        # 
-        # On les sauvegarde les caractéristiques des deux parties du segment en cours dans la variable id_segments : 
-        id_segments <- rbind(id_segments, id_segment_avmoy, id_segment_apmoy)
-        # 
-        # 
-      } 
-      # 
-      # 
+      } else 
+        # else if we do cut at mean 
+        if (cut_at_mean &
+            # and if segments cross the id's average 
+            boolean_cross_mean != 0) { 
+          # 
+          # 
+          # We cut the segment in two, at the point : 
+          y <- id_mean #y = the id's average
+          t <- (y - intercept) / slope #t = ellapsed hour where it crosses
+          # 
+          # 
+          # Compute differences for the first segment 
+          diff_t_avmoy <- t - t1 #duration
+          diff_y_avmoy <- id_mean - y1 #LSNAI
+          # et the second segmend
+          diff_t_apmoy <- t2 - t #duration
+          diff_y_apmoy <- y2 - id_mean #LSNAI
+          # 
+          # Compute area under curve and id mean 
+          auc_to_mean_avmoy <- pracma::trapz(x = c(t1, t),
+                                             y = c(y1 - id_mean, 0))
+          auc_to_mean_apmoy <- pracma::trapz(x = c(t, t2),
+                                             y = c(0, y2 - id_mean))
+          # 
+          # 
+          # Compute area under curve and id min 
+          auc_to_min_avmoy <- pracma::trapz(x = c(t1, t),
+                                            y = c(y1 - id_min, 0))
+          auc_to_min_apmoy <- pracma::trapz(x = c(t, t2),
+                                            y = c(0, y2 - id_min))
+          # 
+          # 
+          # 
+          # Group segments features together 
+          # 1) first segment (same cycle) : 
+          id_segment_avmoy <- c(id, t1, t, diff_t_avmoy, y1, y, diff_y_avmoy, slope, intercept, auc_to_mean_avmoy, auc_to_min_avmoy, ind, boolean_cross_mean)
+          # 2) second segments (new cycle) : 
+          ind <- ind + 1
+          id_segment_apmoy <- c(id, t, t2, diff_t_apmoy, y, y2, diff_y_apmoy, slope, intercept, auc_to_mean_apmoy, auc_to_min_apmoy, ind, boolean_cross_mean)
+          # 
+          # 
+          # Add segment features into id output (id_segments)
+          id_segments <- rbind(id_segments, id_segment_avmoy, id_segment_apmoy)
+          # 
+          # 
+        } 
     }
-    # On convertit en data.frame
+    # 
+    # 
+    # Conversion to data.frame
     id_segments <- as.data.frame(id_segments)
     rownames(id_segments) <- NULL
     # 
     # 
-    # On rajoute la numérotation des segments : 
+    # Add segments numbering
     id_segments$segment_no <- 1:nrow(id_segments)
     # 
     # 
-    # On rajoute les caractéristiques des segments de l'id en cours dans la variable contenant tous les id : 
+    # Add segment features of the id into output (group_segments)
     group_segments <- rbind.data.frame(group_segments, id_segments)
     # 
     # 
   }
   # 
   # 
-  # On renomme les colonnes : 
+  # Set colnames
   colnames(group_segments) <- c("id", "t1", "t2", "diff_t", "y1", "y2", "diff_y", 
                                 "slope", "intercept", "auc_to_mean", "auc_to_min", 
                                 "ind", "mean_inter", "segment_nb")
-  # [ Attention : auc_to_mean     = aire avec pour base la moyenne de l'id (ligne 42)
-  #               et auc_2min   = aire avec pour base la valeur minimal de l'id (ligne 45)
-  #               et mean_inter = variable qui permet de localiser les segments créés ]
-  # et on supprime les noms des lignes :
-  rownames(group_segments) <- NULL #ça remet la numérotation
+  # [ CAREFUL : auc_to_mean     = area under the curve until the mean (ligne 42)
+  #               et auc_2min   = area under the curve until the id min (ligne 45)
+  #               et mean_inter = variable that locates created segments ]
+  # and remove rownames
+  rownames(group_segments) <- NULL # = reset the numbering
   # 
   # 
   # 
-  # On supprime la colonne ind si on ne coupe pas les segments avec la moyenne : 
+  # We delete the ind column if we do not cut the segments with the average
   if (!cut_at_mean) group_segments[ , colnames(group_segments) == "ind"] <- NULL
   # 
-  # On supprime la colonne segment_no si on coupe avec les segments avec la moyenne : 
+  # We delete the column segment_nb if we cut with the segments with the average
   if (cut_at_mean) group_segments[ , colnames(group_segments) == "segment_nb"] <- NULL
-  # et on supprime la colonne mean_inter aussi : 
+  # and we delete the column mean_inter 
   if (cut_at_mean) group_segments[ , colnames(group_segments) == "mean_inter"] <- NULL
   # 
   # 

@@ -1,126 +1,126 @@
-#' Title
+#' Compute cycles by id
 #'
-#' @param data 
+#' @param data a data.frame object of the ESM data described by at least three columns : id, hr and LSNAI. See do_hr to compute hr (ellapsed hours since the monitoring beginning of each id).
 #'
-#' @return
+#' @return a data.frame object of the ESM data's cycles and their features by id.
 #' @export
 #' 
 #' @author Coralie Vennin, \email{coralie.vennin@@gmail.com}
 #' @author Pauline Mialhe, \email{pauline.mialhe@@univ-reunion.fr}
 #'
 #' @examples
-do_cycles <- function(data = data) {
+do_cycles <- function(data) {
   # 
   # 
-  # On doit découper les segments traversent la moyenne de chaque id : 
+  # Check data colnames
+  if (!all(c('id', 'hr', 'LSNAI') %in% colnames(data))) 
+    stop('data should have columns : id, hr and LSNAI')
+  # 
+  # 
+  # Select/Reorder colnames
+  data <- data[ , c('id', 'hr', 'LSNAI')]
+  # 
+  # 
+  # Cycles need segments with cut at mean
   segments_cut <- do_segments(data = data, cut_at_mean = TRUE)
   # 
   # 
-  # La liste des id :
+  # Id list
   list_id <- unique(segments_cut$id)
   # 
   # 
   # 
-  # On initialise un objet qui contiendra les informations des cycles du group :
+  # Initialisation of the function output containing cycles features of all id
   group_cycles <- NULL
   # 
   # 
-  # 
-  # id=1 #test for ====
+  # For each id,
   for (id in list_id) {
     # 
     # 
     # 
-    # On récupère les données de l'id en cours : 
-    id_segments_cut <- segments_cut[segments_cut$id == id, -1]
-    # -1: pour supprimer la colonne contenant la valeur de l'id, on ne garde que 
-    # les colonnes minr et LSNAI
+    # Get id data
+    id_segments_cut <- segments_cut[segments_cut$id == id, c('hr', 'LSNAI')]
     # 
     # 
-    # On comptabilise le nombre de cycle : 
+    # Number of cycle
     nb_cycle <- max(id_segments_cut$ind)
     #   
     # 
     # 
-    # On initialise un objet qui contiendra les informations des cycles de l'id en cours :
+    # Initialisation of the output containing cycles features of id
     id_cycles <- NULL
     # 
     # 
-    # 
-    # icycle=1 # test for ====
+    # For each cycle, 
     for (icycle in 1:nb_cycle) {
       #
-      # On récupère les caractéristiques des segments pour le cycle en cours : 
+      # Get segments features of the cycle
       id_icycle_segs <- id_segments_cut[id_segments_cut$ind == icycle, ]
       # 
       # 
-      # Le nombre segment dans le cycle est : 
+      # Number of segments in the cycle
       seg_number <- nrow(id_icycle_segs)
       # 
       # 
-      # On reconstruit les données de l'id pour le cycle en cours : 
-      id_data <- data.frame(t = c(id_icycle_segs$t1, id_icycle_segs$t2[seg_number]), # les minutes des mesures 
-                            y = c(id_icycle_segs$y1, id_icycle_segs$y2[seg_number])) # les valeurs des mesures 
+      # Formate data for the cycle
+      id_data <- data.frame(t = c(id_icycle_segs$t1, id_icycle_segs$t2[seg_number]), 
+                            y = c(id_icycle_segs$y1, id_icycle_segs$y2[seg_number])) 
       # 
       # 
-      # Toues les variables que l'on veut :
-      t1        <- min(id_data$t) # le temps de début de cycle
-      tn        <- max(id_data$t) # le temps de fin de cycle
-      duration  <- tn - t1 # la durée du cycle
-      y_min     <- min(id_data$y) # le minimum du cycle
-      y_max     <- max(id_data$y) # le maximum du cycle
-      amplitude <- y_max - y_min # l'amplitude du cycle
-      #
-      #
-      # PM : ligne suivante à revoir ?! 
-      # Print if erreur sur signe dans id_icycle_segs$aire
-      u_signes <- unique(sign(id_icycle_segs$auc_to_mean))
-      if (length(u_signes) > 1 & all(u_signes != 0)) {
-        print(paste("ID", id, ":", "cycle n°", icycle))
-      }
-      # 
+      # Cycle feature
+      t1          <- min(id_data$t) # its beginning 
+      tn          <- max(id_data$t) # its ending
+      duration    <- tn - t1 # its duration
+      y_min       <- min(id_data$y) # its LSNAI minimum 
+      y_max       <- max(id_data$y) # its LSNAI maximum 
+      amplitude   <- y_max - y_min # its LSNAI amplitude
+      auc_to_mean <- sum(id_icycle_segs$auc_to_mean) #its area under the curve to the id's average
       # 
       #
-      auc_to_mean <- sum(id_icycle_segs$auc_to_mean)
-      auc_to_min  <- sum(id_icycle_segs$auc_to_min)
-      slope_debut <- id_icycle_segs$slope[1]
-      slope_fin   <- id_icycle_segs$slope[nrow(id_icycle_segs)]
-      # 
-      #
-      # Si l'aire est positive :
-      if (auc_to_mean > 0) {
+      # Add type to extract cycles over the mean (not under)
+      if (auc_to_mean > 0) { 
         type   <- 1
       }
       #
-      # Si l'aire est négative :
       if (auc_to_mean < 0) {
         type   <- -1
       }
       #
+      # Group cycle features together 
       id_icycle <- c(id, type, 
                      t1, tn, duration, 
                      y_min, y_max, amplitude,
                      auc_to_mean)
       #
+      # Add id_icycle to the id output 
       id_cycles <- rbind.data.frame(id_cycles, id_icycle)
       #
     }
+    # 
+    # 
+    # Rename colnames
     colnames(id_cycles) <- c("id", "type", 
                              "t1", "tn", "duration", 
                              "y_min", "y_max", "amplitude", 
                              "auc_to_mean")
-    rownames(id_cycles) <- NULL
+    # Remove rownames
+    rownames(id_cycles) <- NULL #reset numbering
     # 
     # 
+    # Extract cycles and remove type column
     id_cycles <- id_cycles[id_cycles$type == 1, colnames(id_cycles) != "type"]
     # 
     # 
-    # On rajoute la numérotation des phases : 
+    # Remove rownames
     rownames(id_cycles) <- NULL
+    # 
+    # 
+    # Add column with cycle numbering
     id_cycles$cycle_nb <- 1:nrow(id_cycles)
     # 
     #
-    #
+    # Formate cycles output (group_cycles)
     group_cycles <- rbind.data.frame(group_cycles, id_cycles)
   }
   # 

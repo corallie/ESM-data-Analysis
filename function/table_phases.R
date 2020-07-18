@@ -1,7 +1,7 @@
-#' Title
+#' Phases summary by id
 #'
-#' @param phases 
-#' @param save_at 
+#' @param phases a data.frame object of the phases of the ESM data.
+#' @param save_at the path where to save the table (path + file name.csv)
 #'
 #' @return
 #' @export
@@ -13,7 +13,7 @@
 table_phases <- function(phases, save_at = NULL) {
   # 
   # 
-  # Caractéristiques des phases ascendantes :
+  # Features of ascending phases
   phases_asc          <- phases[phases$slope_e > 0, ]
   phases_asc_auc_tot  <- tapply(phases_asc$auc_to_min, phases_asc$id, sum)
   phases_asc_auc_mean <- tapply(phases_asc$auc_to_min, phases_asc$id, mean)
@@ -23,7 +23,7 @@ table_phases <- function(phases, save_at = NULL) {
   phases_asc_nb       <- length(phases_asc)
   # 
   # 
-  # Caractéristiques des phases descendantes :
+  # Features of descending phases
   phases_desc          <- phases[phases$slope_e < 0, ]
   phases_desc_auc_tot  <- tapply(phases_desc$auc_to_min, phases_desc$id, sum)
   phases_desc_auc_mean <- tapply(phases_desc$auc_to_min, phases_desc$id, mean)
@@ -33,7 +33,7 @@ table_phases <- function(phases, save_at = NULL) {
   phases_desc_nb       <- length(phases_desc)
   # 
   # 
-  # Caractéristiques des phases plates :
+  # Features of flat phases
   phases_plat          <- phases[phases$slope_e == 0, ]
   phases_plat_auc_tot  <- tapply(phases_plat$auc_to_min, phases_plat$id, sum)
   phases_plat_auc_mean <- tapply(phases_plat$auc_to_min, phases_plat$id, mean)
@@ -42,13 +42,19 @@ table_phases <- function(phases, save_at = NULL) {
   phases_plat_nb       <- length(phases_plat)
   # 
   # 
-  # On regroupe le tout : 
-  phases_features <- rbind(phases_asc_auc_tot, phases_asc_auc_mean, phases_asc_dur_tot, phases_asc_dur_mean, phases_asc_slope_e, phases_asc_nb, 
-                           phases_desc_auc_tot, phases_desc_auc_mean, phases_desc_dur_tot, phases_desc_dur_mean, phases_desc_slope_e, phases_desc_nb, 
-                           phases_plat_auc_tot, phases_plat_auc_mean, phases_plat_dur_tot, phases_plat_dur_mean, phases_plat_nb)
+  # Group all features together
+  phases_features <- rbind(phases_asc_auc_tot, phases_asc_auc_mean,
+                           phases_asc_dur_tot, phases_asc_dur_mean,
+                           phases_asc_slope_e, phases_asc_nb, 
+                           phases_desc_auc_tot, phases_desc_auc_mean, 
+                           phases_desc_dur_tot, phases_desc_dur_mean, 
+                           phases_desc_slope_e, phases_desc_nb, 
+                           phases_plat_auc_tot, phases_plat_auc_mean,
+                           phases_plat_dur_tot, phases_plat_dur_mean, 
+                           phases_plat_nb)
   # 
   # 
-  # On rajoute id dans le nom de colonne pour que ça soit bien explicite : 
+  # Add id in colnames
   colnames(phases_features) <- paste0("id_", colnames(phases_features))
   # 
   # 
